@@ -11,4 +11,5 @@ const MessageSchema = new mongoose.Schema({
   isRead: { type: Boolean, default: false },
 }, { timestamps: true });
 
-export default mongoose.models.Message || mongoose.model('Message', MessageSchema);
+const MessageModel = mongoose.models.Message || mongoose.model('Message', MessageSchema);
+export default MessageModel as any;

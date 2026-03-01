@@ -4,10 +4,10 @@ const ProjectSchema = new mongoose.Schema({
   clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   title: { type: String, required: true, trim: true },
   description: { type: String, required: true },
-  stage: { 
-    type: String, 
-    enum: ['Discovery', 'Design', 'Development', 'Review', 'Launch'], 
-    default: 'Discovery' 
+  stage: {
+    type: String,
+    enum: ['Discovery', 'Design', 'Development', 'Review', 'Launch'],
+    default: 'Discovery'
   },
   progressPercent: { type: Number, default: 0, min: 0, max: 100 },
   milestoneDate: { type: Date },
@@ -19,10 +19,10 @@ const ProjectSchema = new mongoose.Schema({
     suggestions: [String],
     lastUpdated: Date
   }
-}, { 
+}, {
   timestamps: true,
   toJSON: {
-    transform: (doc, ret) => {
+    transform: (doc, ret: any) => {
       ret.id = ret._id;
       delete ret._id;
       delete ret.__v;
@@ -30,4 +30,5 @@ const ProjectSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.models.Project || mongoose.model('Project', ProjectSchema);
+const ProjectModel = mongoose.models.Project || mongoose.model('Project', ProjectSchema);
+export default ProjectModel as any;

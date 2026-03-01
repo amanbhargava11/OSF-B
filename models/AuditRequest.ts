@@ -8,4 +8,5 @@ const AuditRequestSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'contacted', 'completed'], default: 'pending' },
 }, { timestamps: true });
 
-export default mongoose.models.AuditRequest || mongoose.model('AuditRequest', AuditRequestSchema);
+const AuditRequestModel = mongoose.models.AuditRequest || mongoose.model('AuditRequest', AuditRequestSchema);
+export default AuditRequestModel as any;

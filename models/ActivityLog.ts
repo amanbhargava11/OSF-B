@@ -8,4 +8,5 @@ const ActivityLogSchema = new mongoose.Schema({
   actorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 
-export default mongoose.models.ActivityLog || mongoose.model('ActivityLog', ActivityLogSchema);
+const ActivityLogModel = mongoose.models.ActivityLog || mongoose.model('ActivityLog', ActivityLogSchema);
+export default ActivityLogModel as any;

@@ -9,4 +9,5 @@ const FileSchema = new mongoose.Schema({
   size: { type: String },
 }, { timestamps: true });
 
-export default mongoose.models.File || mongoose.model('File', FileSchema);
+const FileModel = mongoose.models.File || mongoose.model('File', FileSchema);
+export default FileModel as any;

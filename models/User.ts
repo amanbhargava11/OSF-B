@@ -3,41 +3,41 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
+  name: {
+    type: String,
     required: true,
-    trim: true 
+    trim: true
   },
-  email: { 
-    type: String, 
-    required: true, 
+  email: {
+    type: String,
+    required: true,
     unique: true,
     lowercase: true,
-    trim: true 
+    trim: true
   },
-  password: { 
-    type: String, 
+  password: {
+    type: String,
     required: true,
     select: false // Don't return by default
   },
-  role: { 
-    type: String, 
-    enum: ['client', 'admin'], 
-    default: 'client' 
+  role: {
+    type: String,
+    enum: ['client', 'admin'],
+    default: 'client'
   },
   company: { type: String },
-  avatar: { 
+  avatar: {
     type: String,
-    default: function() {
+    default: function () {
       return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent((this as any).name)}`;
     }
   },
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date }
-}, { 
+}, {
   timestamps: true,
   toJSON: {
-    transform: (doc, ret) => {
+    transform: (doc, ret: any) => {
       ret.id = ret._id;
       delete ret._id;
       delete ret.__v;
@@ -48,7 +48,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Pre-save hashing
-UserSchema.pre('save', async function(next) {
+UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   try {
     const salt = await bcrypt.genSalt(10);
@@ -60,8 +60,9 @@ UserSchema.pre('save', async function(next) {
 });
 
 // Method: Compare Password
-UserSchema.methods.comparePassword = async function(candidatePassword: string) {
+UserSchema.methods.comparePassword = async function (candidatePassword: string) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+const UserModel = mongoose.models.User || mongoose.model('User', UserSchema);
+export default UserModel as any;
