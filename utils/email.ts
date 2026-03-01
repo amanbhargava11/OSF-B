@@ -1,22 +1,7 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-// Create reusable transporter
-const createTransporter = () => {
-  // Use environment variables for email configuration
-  // For Gmail: use App Password, not regular password
-  // For other services: adjust accordingly
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER || process.env.EMAIL_USER,
-      pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
-    },
-  });
-
-  return transporter;
-};
+// Initialize Resend with the provided API key or environment variable
+const resend = new Resend(process.env.RESEND_API_KEY || 're_h8f2Pd21_HktFo9CqPxKYwcY4yFctjfwo');
 
 export const sendAuditRequestEmail = async (data: {
   name: string;
@@ -25,22 +10,14 @@ export const sendAuditRequestEmail = async (data: {
   message: string;
 }) => {
   try {
-    // If no email config, just log and return (for development)
-    if (!process.env.SMTP_USER && !process.env.EMAIL_USER) {
-      console.log('[Email] Email not configured. Would send:', {
-        to: process.env.ADMIN_EMAIL || 'info@ourstartupfreelancer.com',
-        subject: `New Audit Request from ${data.name}`,
-        body: `Name: ${data.name}\nEmail: ${data.email}\nService: ${data.service}\n\nMessage:\n${data.message}`
-      });
-      return { success: true, message: 'Email logged (not sent - no SMTP config)' };
-    }
-
-    const transporter = createTransporter();
     const adminEmail = process.env.ADMIN_EMAIL || 'info@ourstartupfreelancer.com';
+    // When using Resend for testing without a verified domain, use onboarding@resend.dev as the from address.
+    // In production, you would configure a verified domain.
+    const fromAddress = process.env.EMAIL_FROM || 'OSF Team <onboarding@resend.dev>';
 
     // Email to admin
-    await transporter.sendMail({
-      from: `"OSF Contact Form" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: fromAddress,
       to: adminEmail,
       subject: `🎯 New Audit Request from ${data.name}`,
       html: `
@@ -76,8 +53,8 @@ Reply to: ${data.email}
     });
 
     // Confirmation email to user
-    await transporter.sendMail({
-      from: `"OSF Team" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: fromAddress,
       to: data.email,
       subject: '✅ Your Audit Request Has Been Received',
       html: `
@@ -139,22 +116,12 @@ export const sendWorkWithUsEmail = async (data: {
   message: string;
 }) => {
   try {
-    // If no email config, just log and return (for development)
-    if (!process.env.SMTP_USER && !process.env.EMAIL_USER) {
-      console.log('[Email] Email not configured. Would send:', {
-        to: process.env.ADMIN_EMAIL || 'info@ourstartupfreelancer.com',
-        subject: `New Work With Us Inquiry from ${data.name}`,
-        body: `Name: ${data.name}\nEmail: ${data.email}\nCompany: ${data.company}\nRole: ${data.role}\n\nMessage:\n${data.message}`
-      });
-      return { success: true, message: 'Email logged (not sent - no SMTP config)' };
-    }
-
-    const transporter = createTransporter();
     const adminEmail = process.env.ADMIN_EMAIL || 'info@ourstartupfreelancer.com';
+    const fromAddress = process.env.EMAIL_FROM || 'OSF Team <onboarding@resend.dev>';
 
     // Email to admin
-    await transporter.sendMail({
-      from: `"OSF Work With Us" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: fromAddress,
       to: adminEmail,
       subject: `🚀 New Work With Us Inquiry from ${data.name}`,
       html: `
@@ -192,8 +159,8 @@ Reply to: ${data.email}
     });
 
     // Confirmation email to user
-    await transporter.sendMail({
-      from: `"OSF Team" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: fromAddress,
       to: data.email,
       subject: '✅ Your Inquiry Has Been Received',
       html: `
